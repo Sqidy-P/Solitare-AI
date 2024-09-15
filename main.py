@@ -17,9 +17,6 @@ card_order = {"Red": [], "Black": []}
 #     while True:
 #         print(pyautogui.position())
 #         time.sleep(2)
-#     ss = pyautogui.screenshot(region=(2176, 190, 216, 63))
-#
-#     ss.save("test.png")
 
 
 # Sets the key to the images, the names, and the value which is what Image.open is returning.
@@ -47,6 +44,7 @@ if __name__ == "__main__":
     set_card_key_to_value()
     set_card_order()
 
-    card_manipulation.update_cards(cards, card_manipulation.tableau_region)
+    card_manipulation.update_cards(cards)
+    card_manipulation.solve(card_order, region=card_manipulation.current_foundation)
 
     # main()
