@@ -5,9 +5,10 @@ from PIL import Image
 
 import card_manipulation
 
-cards_path = "C:\\Users\\Sqidy\\PycharmProjects\\pythonProject\\card_imgs\\"
+cards_path = "C:\\Users\\Sqidy\\PycharmProjects\\Solitare-AI\\card_imgs\\"
 cards = {}
-card_order = {"Red": [], "Black": []}
+card_order_temp = {"Red": [], "Black": []}
+card_order = {}
 
 
 # def main():
@@ -27,6 +28,46 @@ def set_card_key_to_value():
         cards[Path(cards_path + card).stem] = Image.open("card_imgs\\"+card)
 
 
+# Connects each card with its corresponding card
+# e.g. EightOfHearts to NineOfClubs and NineOfSpades
+def set_card_connections(color):
+    opp = ""
+
+    # For every card that's red or black
+    for card in range(26):
+        # Get the reversed color
+        if color == "Red":
+            opp = "Black"
+        else:
+            opp = "Red"
+
+        # Set the key equal to the card the computer is going to associate
+        key = card_order_temp[color][card]
+        # Get the card it associates to
+        value = card_order_temp[opp][card - 1]
+
+        # Ignore any King or Ace cards as to not associate the two
+        if "King" in key or "Ace" in key:
+            pass
+        else:
+            # Add the card and give it its corresponding card
+            card_order[key] = [value]
+
+            try:
+                # Since there are two red or black cards it can connect to,
+                # check for one twelve positions down. It will return an error
+                # if the card associated as value is already a Diamonds or Spades.
+                value = card_order_temp[opp][card + 12]
+
+                card_order[key].append(value)
+
+            except IndexError:
+                # If it's already a Diamonds or Spades, get the other card (Hearts or Clubs)
+                value = card_order_temp[opp][card - 14]
+
+                card_order[key].append(value)
+
+
 # Sets the order of how the cards in the game are supposed to be ordered.
 # Allows for figuring out what cards go together.
 def set_card_order():
@@ -34,17 +75,17 @@ def set_card_order():
     for card in open("CardOrder.txt", "r"):
         # If it's Hearts or Diamonds, put it into the Red key.
         if "Hearts" in card or "Diamonds" in card:
-            card_order["Red"].append(card.strip())
+            card_order_temp["Red"].append(card.strip())
         # If it's Clubs or Spades, put it into the Black key.
         elif "Clubs" in card or "Spades" in card:
-            card_order["Black"].append(card.strip())
+            card_order_temp["Black"].append(card.strip())
+
+    # Associates a card with its corresponding values.
+    # e.g. EightOfHearts to NineOfClubs and NineOfSpades
+    set_card_connections("Red")
+    set_card_connections("Black")
 
 
 if __name__ == "__main__":
     set_card_key_to_value()
     set_card_order()
-
-    card_manipulation.update_cards(cards)
-    card_manipulation.solve(card_order, region=card_manipulation.current_foundation)
-
-    # main()
